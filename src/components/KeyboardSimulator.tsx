@@ -1,5 +1,32 @@
-import {useDispatch, useSelector} from "react-redux";
-import React, {useState} from "react";
+import { useDispatch, useSelector, Provider } from "react-redux";
+import { useState } from "react";
+import { createStore } from "redux";
+import AccessMessage from "./AccessMessage.tsx";
+import Keyboard from "./Keyboard.tsx";
+
+const SET_PIN = 'SET_PIN';
+const CLEAR_PIN = 'CLEAR_PIN';
+
+const setPin = (digit: string) => {
+    return { type: SET_PIN, payload: digit };
+};
+
+const clearPin = () => {
+    return { type: CLEAR_PIN };
+};
+
+const pinReducer = (state = '', action: any) => {
+    switch (action.type) {
+        case SET_PIN:
+            return state.length < 4 ? state + action.payload : state;
+        case CLEAR_PIN:
+            return '';
+        default:
+            return state;
+    }
+};
+
+const store = createStore(pinReducer);
 
 const KeyboardSimulator = () => {
     const dispatch = useDispatch();
@@ -7,7 +34,7 @@ const KeyboardSimulator = () => {
 
     const correctPin = '9999';
     const [accessGranted, setAccessGranted] = useState(false);
-    const [showAccessMessage, setShowAccessMessage] = useState(false); // Добавлено состояние для отображения сообщения
+    const [showAccessMessage, setShowAccessMessage] = useState(false);
 
     const handleButtonClick = (digit: string) => {
         dispatch(setPin(digit));
@@ -19,7 +46,7 @@ const KeyboardSimulator = () => {
             setShowAccessMessage(true);
         } else {
             setAccessGranted(false);
-            setShowAccessMessage(false);
+            setShowAccessMessage(true);
         }
     };
 
@@ -29,22 +56,24 @@ const KeyboardSimulator = () => {
     };
 
     return (
-        <div>
-            {accessGranted ? (
-                <AccessMessage message="Access Granted" color="green" />
-            ) : pin.length === 4 && showAccessMessage ? (
-                <AccessMessage message="Access Denied" color="red" />
-            ) : null}
+        <Provider store={store}> {/* Provide the store to the application */}
             <div>
-                <div>Password: {pin.replace(/./g, '*')}</div>
-                <Keyboard
-                    onButtonClick={handleButtonClick}
-                    onClear={handleClear}
-                    onEnter={handleEnter}
-                />
+                {accessGranted ? (
+                    <AccessMessage message="Access Granted" color="green" />
+                ) : pin.length === 4 && showAccessMessage ? (
+                    <AccessMessage message="Access Denied" color="red" />
+                ) : null}
+                <div>
+                    <div>Password: {pin.replace(/./g, '*')}</div>
+                    <Keyboard
+                        onButtonClick={handleButtonClick}
+                        onClear={handleClear}
+                        onEnter={handleEnter}
+                    />
+                </div>
             </div>
-        </div>
+        </Provider>
     );
 };
 
-export default KeyboardSimulator
+export default KeyboardSimulator;
