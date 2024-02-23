@@ -1,7 +1,6 @@
-import { createStore, applyMiddleware } from 'redux';
+import { createStore } from 'redux';
 import pinActions from './action/pinActions';
-import thunk from 'redux-thunk';
 
-const store = createStore(pinActions, applyMiddleware(thunk));
+const store = createStore(pinActions);
 
 export default store;
