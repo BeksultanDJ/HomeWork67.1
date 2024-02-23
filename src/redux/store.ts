@@ -1,6 +1,8 @@
-import { createStore } from 'redux';
-import pinActions from './action/pinActions';
+import { configureStore } from '@reduxjs/toolkit';
+import pinReducer from './action/pinReducer';
 
-const store = createStore(pinActions);
-
-export default store;
+export const store = configureStore({
+    reducer: {
+        pin: pinReducer,
+    },
+});
